@@ -12,8 +12,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 ###################
 # 1 CONFIG
 ###################
-URL_input = "https://susy.mdpi.com/special_issue/process/1760628"
-EXCEL_FILE = "D:/Manuscripts/Special Issue work/GE invitation list/5.3.2026-GE.xlsx"
+URL_input = "https://susy.mdpi.com/special_issue/process/1679851"
+EXCEL_FILE = "D:/Manuscripts/Special Issue work/GE invitation list/5.3.2026-GE-1.xlsx"
 JOURNAL_TEXT = "Journal of Personalized Medicine (JPM)"
 email_section_path='//*[@id="form_email"]'
 NEXT_button_path='//*[@id="guestNextBtn"]'
@@ -51,7 +51,7 @@ for index, row in df.iterrows():
     while datetime.now() < target_time:
         time.sleep(0.1)
 
-    print(f"\n>>> Processing: {email}")
+    print(f"\n>>> Processing: {email} at {target_time}")
 
     success = False
     while not success:
@@ -61,7 +61,6 @@ for index, row in df.iterrows():
             email_input.clear()
             email_input.send_keys(email)
             driver.find_element(By.XPATH, NEXT_button_path).click()
-
             # 2. Wait for page to stabilize
             time.sleep(2) 
             
@@ -78,9 +77,11 @@ for index, row in df.iterrows():
             proceed_btns = [btn for btn in driver.find_elements(By.XPATH, proceed_button_path) if btn.is_displayed()]
             if proceed_btns:
                 print("Proceed button found! Inviting...")
-                driver.execute_script("arguments[0].click();", proceed_btns[0])
+                proceed_btn = wait.until(EC.element_to_be_clickable((By.XPATH, proceed_button_path))) #new1
+                driver.execute_script("arguments[0].click();", proceed_btn) #new2
+                #driver.execute_script("arguments[0].click();", proceed_btns[0]) #remove1
                 success = True
-                time.sleep(2)
+                time.sleep(2.5)
                 continue
 
             # --- PRIORITY 3: Check for BACK (The "Already Invited" case) ---
@@ -89,9 +90,9 @@ for index, row in df.iterrows():
                 print("Already invited. Clicking Back.")
                 driver.execute_script("arguments[0].click();", back_btns[0])
                 success = True
-                time.sleep(1)
+                time.sleep(2.5)
 
         except Exception as e:
             print(f"Error: {str(e)[:50]}... Refreshing.")
             driver.refresh()
-            time.sleep(2)
+            time.sleep(2.5)
