@@ -1,6 +1,6 @@
 import time
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta # just added time delta
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -9,11 +9,35 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
+
+###################
+# 0. Scheduled Start Time # added schedule time just want to run the script at the expected time
+###################
+START_HOUR = 6 # start running at 6 am 
+START_MINUTE = 15 # 6 am and 15 mins (6.15 am)
+
+now = datetime.now()
+start_time = now.replace(hour=START_HOUR, minute=START_MINUTE, second=0, microsecond=0)
+
+# If the time already passed today → run tomorrow
+if now >= start_time:
+    start_time = start_time + timedelta(days=1)
+
+wait_seconds = (start_time - now).total_seconds()
+
+print(f"Current time: {now}")
+print(f"Script scheduled to start at: {start_time}")
+print(f"Waiting {wait_seconds/60:.2f} minutes...")
+
+time.sleep(wait_seconds)
+
+print("Start time reached. Starting script...")
+
 ###################
 # 1 CONFIG
 ###################
-URL_input = "https://susy.mdpi.com/special_issue/process/1679851"
-EXCEL_FILE = "D:/Manuscripts/Special Issue work/GE invitation list/5.3.2026-GE-1.xlsx"
+URL_input = "https://susy.mdpi.com/special_issue/process/1664382"
+EXCEL_FILE = "D:/Manuscripts/Special Issue work/GE invitation list/9.3.2026-GE-1.xlsx"
 JOURNAL_TEXT = "Journal of Personalized Medicine (JPM)"
 email_section_path='//*[@id="form_email"]'
 NEXT_button_path='//*[@id="guestNextBtn"]'
